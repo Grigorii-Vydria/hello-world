@@ -18,7 +18,6 @@ import { log } from "@/utils/logger";
 
 import { Options } from "@/model/options/options-model";
 import { Pins } from "@/model/options/pins";
-import { Services } from "@/services";
 import { Dialog } from "@/ui/dialog/dialog";
 import { dialogState } from "@/ui/dialog/state";
 import { tip } from "@/ui/tooltips";
@@ -122,10 +121,7 @@ function announceVersion(): void {
 
   const storedVersion = localStorage.getItem("version");
   if (!storedVersion || compareVersions(storedVersion, VERSION, { major: true, minor: true, patch: false }).isOlder) {
-    setTimeout(() => {
-      localStorage.setItem("version", VERSION); // stored once shown, so the window opens once
-      Services.ReleaseNotes.open({ afterUpdate: true });
-    }, 6000);
+    localStorage.setItem("version", VERSION);
   } else if (compareVersions(storedVersion, VERSION).isOlder) {
     localStorage.setItem("version", VERSION);
     tip(t("Updated to v{{version}}. Reload the page if you get errors", { version: VERSION }), true, "success", 6000);
