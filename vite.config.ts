@@ -156,7 +156,7 @@ const preloadApp = (): Plugin => {
 
 export default ({ mode }: { mode: string }) => ({
   root: "./src",
-  base: mode === "electron" ? "./" : "/",
+  base: mode === "electron" ? "./" : "/hello-world/",
   plugins: [slimEnglish, preloadApp(), latestUpdate, localMapGallery, ...(mode === "electron" ? [stripWebOnlyTags] : [])],
   build: {
     outDir: mode === "electron" ? "../dist-electron/renderer" : "../dist",
