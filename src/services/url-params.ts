@@ -6,7 +6,6 @@ import { Controllers } from "@/controllers";
 import type { Burg } from "@/model/political/burgs-generator";
 import { Layers } from "@/renderers/layers";
 import { Services } from "@/services";
-import { getRequestedMapSize } from "@/services/map-size";
 import { App } from "@/ui/app-commands";
 import { toggleAssistant } from "@/ui/assistant-bubble";
 import { fitMapToScreen } from "@/ui/map/canvas";
@@ -16,62 +15,12 @@ import { t } from "@/utils/i18n";
 import { log } from "@/utils/logger";
 import { ensureEl } from "@/utils/node-utils";
 
-const MAP_LINK_PATTERN = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
-
 const searchParams = () => new URL(window.location.href).searchParams;
 
-/** Decide what to put on screen on start-up: a linked map, a stored map, or a fresh one */
+/** The public viewer always opens the published map. */
 export async function checkLoadParameters(): Promise<void> {
-  const params = searchParams();
-
-  const basePath = import.meta.env.BASE_URL.replace(/\/+$/, "");
-  const path = window.location.pathname.replace(/\/+$/, "");
-  const variant = path.startsWith(`${basePath}/`) ? path.slice(basePath.length + 1) : "";
-  if (/^[1-5]$/.test(variant)) {
-    const mapUrl = new URL(`${import.meta.env.BASE_URL}maps/${variant}.map`, window.location.origin).href;
-    log.warn(`Load local map variant ${variant}`);
-    await Services.Load.loadMapFromURL(mapUrl);
-    return;
-  }
-
-  // a linked map is generated at the size the link asks for, whatever the window measures
-  const size = getRequestedMapSize(params);
-
-  const maplink =
-    params.get("maplink") ??
-    (!params.has("seed") ? new URL(`${import.meta.env.BASE_URL}map.map`, window.location.origin).href : null);
-  if (maplink) {
-    log.warn("Load map from URL");
-    if (MAP_LINK_PATTERN.test(maplink)) {
-      setTimeout(() => Services.Load.loadMapFromURL(maplink, true), 1000);
-      return;
-    }
-    Services.Load.showUploadErrorMessage(t("Map link is not a valid URL"), maplink);
-  }
-
-  // a seed provided by the user or by MFCG: generate the map it describes
-  if (params.get("seed")) {
-    log.warn("Generate map for seed", params.get("seed"));
-    await generateMapOnLoad(size);
-    return;
-  }
-
-  if (options.app.onLoad === "lastSaved") {
-    try {
-      const latest = await Services.BrowserSaves.latest();
-      const blob = latest && (await Services.BrowserSaves.read(latest.id));
-      if (blob) {
-        log.warn("Loading last stored map");
-        Services.Load.uploadMap(blob);
-        return;
-      }
-    } catch (error) {
-      log.error(error);
-    }
-  }
-
-  log.warn("Generate random map");
-  generateMapOnLoad(size);
+  const mapUrl = new URL(`${import.meta.env.BASE_URL}map.map`, window.location.origin).href;
+  await Services.Load.loadMapFromURL(mapUrl);
 }
 
 /** The start-up path: style, world, layers, then wherever the URL says to look */
@@ -90,7 +39,7 @@ export function focusOn(): void {
   const params = searchParams();
   App.applyURLLayers(params);
 
-  if (params.get("from") === "MFCG" && document.referrer) {
+  if (!options.map.viewOnly && params.get("from") === "MFCG" && document.referrer) {
     const mfcgSeed = params.get("seed") ?? "";
     // a 13-char MFCG seed carries the burg id in its last 4 digits: show that burg back
     if (mfcgSeed.length === 13) params.set("burg", mfcgSeed.slice(-4));

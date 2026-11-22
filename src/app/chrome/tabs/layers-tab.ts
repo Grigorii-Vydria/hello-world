@@ -52,8 +52,8 @@ const TEMPLATE = /* html */ `
     ></button>
     <button id="layersOrderButton" data-tip="${t("Change the layer order")}" class="icon-sort-alt-down sideButton"></button>
   </div>
-  <div data-tip="${sentences(t("Click to toggle the layer"), t("Ctrl + click to edit layer style"))}" id="mapLayers"></div>
-  <div class="tip">${t("Click to toggle the layer")}. ${t("Ctrl + click to edit layer style")}</div>
+  <div data-tip="${t("Click to toggle the layer")}" id="mapLayers"></div>
+  <div class="tip">${t("Click to toggle the layer")}</div>
   <div id="viewMode" data-tip="${t("Set view mode")}">
     <p>${t("View mode")}:</p>
     <button data-tip="${t("Standard view mode for editing the map")}" id="viewStandard" class="pressed">
@@ -79,10 +79,8 @@ function render(): void {
 
       const item = document.createElement("button");
       item.dataset.layer = layer.id;
-      item.dataset.tip = sentences(
-        t("Toggle {{- layer}}", { layer: button.label }),
-        t("Ctrl + click to edit layer style")
-      );
+      const toggleTip = t("Toggle {{- layer}}", { layer: button.label });
+      item.dataset.tip = options.map.viewOnly ? toggleTip : sentences(toggleTip, t("Ctrl + click to edit layer style"));
       if (button.shortcut) item.dataset.shortcut = button.hint ?? button.shortcut.replace("Key", "");
       item.innerHTML = underlineHotkey(button);
       item.classList.toggle("buttonoff", !Layers.isOn(layer.id));

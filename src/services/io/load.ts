@@ -285,7 +285,7 @@ async function parseLoadedData(data: string[], mapVersion: string | null): Promi
     const settings = data[1] ? safeParseJSON(data[1]) : null;
     if (!settings) throw new Error("Map settings are missing or malformed");
     Options.applyLoaded(settings);
-    if (new URL(window.location.href).searchParams.get("view") === "1") options.map.viewOnly = true;
+    options.map.viewOnly = true;
     App.syncOptionInputs();
     await Controllers.StylePresetsEditor.init(); // the preset row follows the loaded map
 

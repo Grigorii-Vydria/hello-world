@@ -112,8 +112,6 @@ function handleKeyup(event: KeyboardEvent): void {
 const BROWSING_CODES = [
   "Space",
   "F1",
-  "F2",
-  "F9",
   "Tab",
   "Escape",
   "KeyO",
@@ -123,7 +121,7 @@ const BROWSING_CODES = [
   "ArrowDown"
 ];
 
-/** The keys a view-only map answers: menu, search, info, new map, load, 3D options, pan, zoom and layers */
+/** The keys a view-only map answers: menu, search, info, 3D options, pan, zoom and layers */
 function isBrowsingKey({ code, key, ctrlKey, metaKey, altKey, shiftKey }: KeyboardEvent): boolean {
   if (ctrlKey || metaKey || altKey) return false;
   if (BROWSING_CODES.includes(code)) return true;

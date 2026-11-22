@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ open: vi.fn(), save: vi.fn(), getLayer: vi.fn(), edit: vi.fn(), zoom: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  open: vi.fn(), save: vi.fn(), getLayer: vi.fn(), edit: vi.fn(), zoom: vi.fn(), regenerate: vi.fn(), load: vi.fn()
+}));
 vi.mock("@/app/chrome/options-panel", () => ({ hideOptions: vi.fn(), toggleOptions: vi.fn() }));
 vi.mock("@/controllers", () => ({
   Controllers: {
@@ -10,7 +12,7 @@ vi.mock("@/controllers", () => ({
     MarkerCreator: { toggle: mocks.edit }
   }
 }));
-vi.mock("@/services", () => ({ Services: { Save: { toMachine: mocks.save } } }));
+vi.mock("@/services", () => ({ Services: { Save: { toMachine: mocks.save }, Load: { quickLoad: mocks.load } } }));
 vi.mock("@/services/autosave", () => ({ toggleSaveReminder: vi.fn() }));
 vi.mock("./chrome/tabs/layers-tab", () => ({ getLayerByShortcut: mocks.getLayer }));
 vi.mock("@/ui/map/zoom", () => ({
@@ -19,7 +21,7 @@ vi.mock("@/ui/map/zoom", () => ({
   resetZoom: vi.fn(),
   setMapZoom: mocks.zoom
 }));
-vi.mock("./lifecycle", () => ({ regeneratePrompt: vi.fn() }));
+vi.mock("./lifecycle", () => ({ regeneratePrompt: mocks.regenerate }));
 
 import "./hotkeys";
 
@@ -44,6 +46,8 @@ beforeEach(() => {
   mocks.getLayer.mockClear();
   mocks.edit.mockClear();
   mocks.zoom.mockClear();
+  mocks.regenerate.mockClear();
+  mocks.load.mockClear();
   globalThis.options = { map: {} } as typeof options;
 });
 
@@ -116,6 +120,13 @@ describe("a view-only map", () => {
   it("ignores creator hotkeys on layouts where they need no Shift", () => {
     press(document.body, "Backslash", "#"); // German QWERTZ
     expect(mocks.edit).not.toHaveBeenCalled();
+  });
+
+  it("does not replace the published map using hotkeys", () => {
+    press(document.body, "F2");
+    press(document.body, "F9");
+    expect(mocks.regenerate).not.toHaveBeenCalled();
+    expect(mocks.load).not.toHaveBeenCalled();
   });
 
   it("keeps the browsing keys", () => {
