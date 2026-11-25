@@ -1,17 +1,13 @@
 // Azgaar and contributors, 2017-2026. MIT License
 // https://github.com/Azgaar/Fantasy-Map-Generator
 
-import { readStoredOptions } from "@/model/options/options-storage";
-import { resolveLanguage } from "@/services/language";
-import { Catalog, t } from "@/utils/i18n";
+import { Catalog } from "@/utils/i18n";
 import { log } from "@/utils/logger";
 
 async function start(): Promise<void> {
-  const { app } = readStoredOptions() as { app?: { language?: unknown } };
-  const language = resolveLanguage(app?.language);
+  const language = "uk"; // the published map is always in Ukrainian, whatever the browser or a stored choice says
   document.documentElement.lang = language;
   await Catalog.load(language).catch(error => log.error("Interface strings failed to load", error));
-  document.title = t("Azgaar's Fantasy Map Generator");
   const { boot } = await import("./app");
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else void boot();

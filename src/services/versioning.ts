@@ -115,7 +115,6 @@ export async function cleanupData(): Promise<void> {
 function announceVersion(): void {
   if (parseMapVersion(VERSION) !== VERSION) log.error("versioning: Invalid format or parsing function");
 
-  document.title += ` v${VERSION}`;
   const loadingScreenVersion = findEl("versionText");
   if (loadingScreenVersion) loadingScreenVersion.textContent = `v${VERSION}`;
 
