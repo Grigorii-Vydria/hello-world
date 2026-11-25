@@ -9,6 +9,7 @@ export const Controllers = createRegistry(
     BurgCreator: () => import("@/controllers/political/burgs/burg-creator").then(m => m.BurgCreator),
     BurgEditor: () => import("@/controllers/political/burgs/burg-editor").then(m => m.BurgEditor),
     BurgGroupEditor: () => import("@/controllers/political/burgs/burg-group-editor").then(m => m.BurgGroupEditor),
+    BurgViewer: () => import("@/controllers/political/burgs/burg-viewer").then(m => m.BurgViewer),
     BurgsOverview: () => import("@/controllers/political/burgs/burgs-overview").then(m => m.BurgsOverview),
     CellInfo: () => import("@/controllers/cell-info").then(m => m.CellInfo),
     ChartsOverview: () => import("@/controllers/charts-overview").then(m => m.ChartsOverview),

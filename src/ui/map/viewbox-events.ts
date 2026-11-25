@@ -101,7 +101,15 @@ export function openEditor(element: Element): boolean {
 }
 
 function onClick(event: MouseEvent): void {
-  if (event?.target && !options.map.viewOnly) openEditor(event.target as Element);
+  if (!event?.target) return;
+  if (!options.map.viewOnly) openEditor(event.target as Element);
+  else openBurgCard(event.target as Element);
+}
+
+/** A view-only map has no editors: a click on a burg shows its read-only card */
+function openBurgCard(target: Element): void {
+  const burg = target.closest<SVGElement>("[data-label-type='burg'][data-id], #burgIcons [data-id]");
+  if (burg) void Controllers.BurgViewer.open(Number(burg.dataset.id));
 }
 
 /** Right-click on the map belongs to the context menu; Shift+right-click keeps the browser's own */
