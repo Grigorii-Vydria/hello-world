@@ -2477,7 +2477,7 @@ body.tour-free-roam * {
 /* a map with options.map.viewOnly: browsing only */
 body.view-only :is(
   #styleTab, #optionsTab, #toolsTab, #assistantBubble, #newMapButton, #loadButton, #saveButton, #regenerate,
-  #savePresetButton, #removePresetButton, #layersOrderButton
+  #savePresetButton, #removePresetButton, #layersOrderButton, #viewMode
 ) {
   display: none !important;
 }
